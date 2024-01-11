@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 import time
 import threading
 output_lock = threading.Lock() # krmel l threads ma yiktbo ma3 ba3d w y5arrbo l dinya
-   
+lock=threading.Lock()
 
 def appendPara(original_string, append_string): # la n3abbi l payload
     return original_string[:-1] + append_string
@@ -39,18 +39,22 @@ def check_response(url,payload,Email):# l ossa killa
             print(f"\rFound '{payload}' in the webpage {newURL}")
             with open("foundxss.txt",'a',encoding='utf-8') as xss:
                 xss.write(newURL+'\n')
-        send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+        # send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
         
 def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     start_time = time.time()
     while True:
         elapsed_time = time.time() - start_time
-        print(f"\rElapsed time: {elapsed_time:.2f} seconds", end='', flush=True)
-        time.sleep(0.1)
+        with output_lock:
+            with open("progress.txt",'r') as pr:
+                stat=pr.readline()
+            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process urls: {stat}", end='', flush=True)
+            time.sleep(0.1)
     
 def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race condition
     while True:
-        if len(futures)<=num_of_threads*num_of_threads:
-            event.set()
-        else:
-            futures = [f for f in futures if not f.done()]# krmel nim7i mn l list le 5olso
+        with lock:
+            if len(futures)<=num_of_threads*num_of_threads:
+                event.set()
+            else:
+                futures = [f for f in futures if not f.done()]# krmel nim7i mn l list le 5olso

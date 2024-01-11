@@ -4,12 +4,15 @@ event1 = threading.Event()
 
 def main():
     try:
+        with open("progress.txt",'w') as prog:
+                    prog.write("calculating...")
+        num_of_processed_urls = 0
         print("IMPORTANT : urls should be formatted as follow :\"https://example.com?q=ok\" use use the \"does\" tool to format your urls properly")
         urlfile = input("File path: ")
         num_of_threads = int(input("nb of urls at the same time : "))
         Email = input("Email :")
         futures = []
-        payloads = ['<yaali>', '"yaali\'', '/yaali', 'yaali;', '{yaali}']
+        payloads = ['<yaali>', 'ya"ali\'', 'ya/ali' , '{ya{}ali}']
         
         elapsed_time_thread = threading.Thread(target=measure_elapsed_time)
         elapsed_time_thread.daemon = True
@@ -21,6 +24,7 @@ def main():
         
         with open(urlfile, "r", encoding='utf-8') as uf:
             urls = uf.readlines()
+            len_of_file=len(urls)
             
         event1.set()
         with ThreadPoolExecutor(max_workers=num_of_threads*num_of_threads) as executor:
@@ -30,7 +34,11 @@ def main():
                     future=executor.submit(check_response,url, payload,Email)
                     futures.append(future)
                 event1.clear()
-                    
+                num_of_processed_urls+=1
+                stat=f"{num_of_processed_urls}/{len_of_file}"
+                with open("progress.txt",'w') as prog:
+                    prog.write(stat)
+                
     except Exception as e:
         print(f"An error occurred: {e}")
             
