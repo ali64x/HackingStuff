@@ -39,7 +39,7 @@ def check_response(url,payload,Email):# l ossa killa
             print(f"\rFound '{payload}' in the webpage {newURL}")
             with open("foundxss.txt",'a',encoding='utf-8') as xss:
                 xss.write(newURL+'\n')
-        # send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+        send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
         
 def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     start_time = time.time()
