@@ -31,6 +31,8 @@ def main():
                         if c == 'y':
                             line_number = num_of_processed_urls
                             con=True
+                        elif c == 'n':
+                            break
                         c = input("please confirm your choice with 'y' for yes or 'n' for no \"case sensitive\" : ")   
                         
                 
