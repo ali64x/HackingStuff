@@ -31,30 +31,65 @@ def send_email(to_address, subject, body):# wad7a la nib3at email
 
     print(f"Email sent successfully to {to_address}")
 
-def check_response(url,payload,Email):# l ossa killa 
-    newURL= appendPara(url,payload)
-    response=requests.get(newURL)
-    if payload in response.text:
+def check_response(url,payload,Email,stat,tries=0):# l ossa killa 
+    try:
+        newURL= appendPara(url,payload)
+        response=requests.get(newURL)
+        html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print(f"\rFound '{payload}' in the webpage {newURL}")
-            with open("foundxss.txt",'a',encoding='utf-8') as xss:
-                xss.write(newURL+'\n')
-        send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
-        
+            print (stat,end="\r")
+        if html_content:
+            if payload in html_content:
+                with output_lock:
+                    print(f"\rFound '{payload}' in the webpage {newURL}")
+                    with open("foundxss.txt",'a',encoding='utf-8') as xss:
+                        xss.write(newURL+'\n')
+                send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+    except:
+        with open("exceptions.txt",'a') as e:
+            e.write(url)
+            
 def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     start_time = time.time()
     while True:
         elapsed_time = time.time() - start_time
         with output_lock:
-            with open("progress.txt",'r') as pr:
-                stat=pr.readline()
-            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process urls: {stat}", end='', flush=True)
+            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process urls: ", end='', flush=True)
             time.sleep(0.1)
     
 def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race condition
     while True:
-        with lock:
-            if len(futures)<=num_of_threads*num_of_threads:
+            if len(futures) <= num_of_threads*num_of_threads:
                 event.set()
             else:
-                futures = [f for f in futures if not f.done()]# krmel nim7i mn l list le 5olso
+                event.clear()                   
+                new_futures = []
+                for f in futures:                        # krmel nim7i mn l list le 5olso
+                    if not f.done():
+                        new_futures.append(f)
+                futures = new_futures
+                
+def search_and_extract(key, file_path):
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                index = line.find(key)
+                if index != -1:
+                    result=(line[index + len(key):].strip())
+                    return result
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    
+def progress (key, string):
+    index = string.find(key)
+    if index != -1:
+        result=(string[:index].strip())
+        return result
+    
+def total (key, string):
+    index = string.find(key)
+    if index != -1:
+        result=(string[index+1:].strip())
+        return result
+    
+    
