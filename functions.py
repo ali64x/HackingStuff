@@ -31,13 +31,13 @@ def send_email(to_address, subject, body):# wad7a la nib3at email
 
     print(f"Email sent successfully to {to_address}")
 
-def check_response(url,payload,Email,stat,tries=0):# l ossa killa 
+def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa 
     try:
         newURL= appendPara(url,payload)
-        response=requests.get(newURL)
+        response=requests.get(newURL,timeout=time)
         html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print (stat,end="\r")
+            print (stat,end="             \r")
         if html_content:
             if payload in html_content:
                 with output_lock:
@@ -45,7 +45,11 @@ def check_response(url,payload,Email,stat,tries=0):# l ossa killa
                     with open("foundxss.txt",'a',encoding='utf-8') as xss:
                         xss.write(newURL+'\n')
                 send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
-    except:
+        else:
+            if tries < 15:
+                check_response(url,payload,Email,stat,tries+1)
+                time.sleep(0.5)
+    except :
         with open("exceptions.txt",'a') as e:
             e.write(url)
             
@@ -54,7 +58,7 @@ def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     while True:
         elapsed_time = time.time() - start_time
         with output_lock:
-            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process urls: ", end='', flush=True)
+            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process url number: ", end='', flush=True)
             time.sleep(0.1)
     
 def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race condition

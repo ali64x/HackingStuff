@@ -85,7 +85,22 @@ def main():
                 
     except Exception as e:
         print(f"An error occurred: {e}")
+        send_email(
+            to_address = search_and_extract("Email:","last_run.txt"),
+            subject="Progress Update",
+            body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
+            )
+        
+    except KeyboardInterrupt:
+        print(f"shutting down please wait utill the already in process urls is done")
+        executor.shutdown(wait=True)
                
 if __name__ == "__main__":
     main()
+    urlfile= search_and_extract("urlfile:","last_run.txt")
+    send_email(
+        to_address = search_and_extract("Email:","last_run.txt"),
+        subject="Progress Update",
+        body=f"Job is over : {urlfile}"
+    )
     print("\nAll DONE !")
