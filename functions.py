@@ -50,11 +50,11 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
                 check_response(url,payload,Email,stat,tries+1)
                 time.sleep(0.5)
     except :
-        with output_lock:
-         with open("exceptions.txt",'r+') as e:
-            filelines=e.readlines().strip()
-            if url not in filelines: 
-                e.write(url)
+        with lock:
+           with open("exceptions.txt",'r+') as e:
+              filelines=e.readlines().strip()
+              if url not in filelines: 
+                  e.write(url)
             
 def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     start_time = time.time()
