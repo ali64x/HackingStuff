@@ -1,3 +1,1 @@
-urlfile:D:\\hacking_stuff\\testing_file_for_xss_tool.txt
-num_of_threads:2
-Email:htlr780@gmail.com
+
