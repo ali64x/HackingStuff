@@ -32,7 +32,9 @@ def main():
                             line_number = num_of_processed_urls
                             con=True
                         elif c == 'n':
-                            break
+                            a = input("please confirm your choice with 'y' for yes or 'n' for no : ")   
+                            if a == "n":
+                                break
                         c = input("please confirm your choice with 'y' for yes or 'n' for no \"case sensitive\" : ")   
                         
                 
@@ -41,11 +43,12 @@ def main():
             urlfile = input("File path: ")
             num_of_threads = int(input("nb of urls at the same time : "))
             Email = input("Email : ")
+            num_of_processed_urls= 0
             with open("last_run.txt",'w') as lr:
                 details=(f"urlfile:{urlfile}\nnum_of_threads:{num_of_threads}\nEmail:{Email}")
                 lr.write(details)
-            with open("progress.txt",'w') as p:
-                p.write("calculating...")
+            stat=f"calculating please wait ..."
+            print("\r"+stat)
         futures = [] 
         payloads = ['<yaali>', 'ya"ali\'', 'ya/ali' , '{ya{}ali}'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
         
