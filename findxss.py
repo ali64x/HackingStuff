@@ -10,7 +10,7 @@ def main():
         num_of_processed_urls=0
         
         with open("progress.txt",'r+') as prog:
-            progr=prog.readline()
+            progr=prog.readline().strip()
             if progr:
                 
                 urlfile= search_and_extract("urlfile:","last_run.txt")
@@ -79,7 +79,6 @@ def main():
                     futures.append(future)
                     
                 event1.clear()
-        print(stat)
         with open("progress.txt",'w') as p:
             p.write('')
                 

@@ -37,7 +37,7 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
         response=requests.get(newURL,timeout=time)
         html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print (stat,end="             \r")
+            print (stat.strip(),end="             \r")
         if html_content:
             if payload in html_content:
                 with output_lock:
@@ -50,8 +50,10 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
                 check_response(url,payload,Email,stat,tries+1)
                 time.sleep(0.5)
     except :
-        with open("exceptions.txt",'a') as e:
-            e.write(url)
+        with open("exceptions.txt",'r+') as e:
+            filelines=e.readlines().strip()
+            if url not in filelines: 
+                e.write(url)
             
 def measure_elapsed_time():# la ni3rif addeh akal w2t l program
     start_time = time.time()
