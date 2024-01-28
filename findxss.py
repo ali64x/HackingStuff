@@ -10,9 +10,9 @@ def main():
         num_of_processed_urls=0
         
         with open("progress.txt",'r+') as prog:
-            progr=prog.readline()
+            progr=prog.readline().strip()
             if progr:
-                
+                 
                 urlfile= search_and_extract("urlfile:","last_run.txt")
                 num_of_threads = int(search_and_extract("num_of_threads:","last_run.txt"))
                 Email = search_and_extract("Email:","last_run.txt")
