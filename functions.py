@@ -37,7 +37,7 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
         response=requests.get(newURL,timeout=time)
         html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print (stat.strip(),end='')
+            print (stat.strip(),end='\r')
         if html_content:
             if payload in html_content:
                 with output_lock:
