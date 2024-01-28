@@ -50,7 +50,8 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
                 check_response(url,payload,Email,stat,tries+1)
                 time.sleep(0.5)
     except :
-        with open("exceptions.txt",'r+') as e:
+        with output_lock:
+         with open("exceptions.txt",'r+') as e:
             filelines=e.readlines().strip()
             if url not in filelines: 
                 e.write(url)
