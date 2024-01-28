@@ -29,7 +29,7 @@ def send_email(to_address, subject, body):# wad7a la nib3at email
         server.login(sender_email, sender_password)
         server.sendmail(sender_email, to_address, msg.as_string())
 
-    print(f"Email sent successfully to {to_address}")
+    print(f"\rEmail sent successfully to {to_address}")
 
 def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa 
     try:
@@ -37,7 +37,7 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
         response=requests.get(newURL,timeout=time)
         html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print (stat.strip(),end="             \r")
+            print (stat.strip(),end='')
         if html_content:
             if payload in html_content:
                 with output_lock:
@@ -84,7 +84,7 @@ def search_and_extract(key, file_path):
                     result=(line[index + len(key):].strip())
                     return result
     except FileNotFoundError:
-        print(f"File not found: {file_path}")
+        print(f"\rFile not found: {file_path}")
     
 def progress (key, string):
     index = string.find(key)

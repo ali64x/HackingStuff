@@ -94,7 +94,7 @@ def main():
             )
         
     except KeyboardInterrupt:
-        print(f"shutting down please wait utill the already in process urls is done")
+        print(f"\rshutting down please wait utill the already in process urls is done")
         executor.shutdown(wait=True)
                
 if __name__ == "__main__":
