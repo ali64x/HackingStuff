@@ -74,8 +74,7 @@ def main():
                 
                 stat=f"{num_of_processed_urls}/{len_of_file}"
 
-                with output_lock:
-                 with open("progress.txt",'w') as prog:
+                with open("progress.txt",'w') as prog:
                     prog.write(stat)
                     
                 for payload in payloads:
