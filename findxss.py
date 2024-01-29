@@ -2,7 +2,7 @@ from functions import *
 from functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 event1 = threading.Event()
-progress_lock = threading.lock()
+progress_lock = threading.Lock()
 def main():
     try:
         con=False # continue aw la
