@@ -2,7 +2,7 @@ from functions import *
 from functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 event1 = threading.Event()
-
+progress_lock = threading.lock()
 def main():
     try:
         con=False # continue aw la
@@ -73,9 +73,10 @@ def main():
                 num_of_processed_urls+=1
                 
                 stat=f"{num_of_processed_urls}/{len_of_file}"
-
-                with open("progress.txt",'w') as prog:
-                    prog.write(stat)
+                
+                with progress_lock:
+                 with open("progress.txt",'w') as prog:
+                     prog.write(stat)
                     
                 for payload in payloads:
                     future=executor.submit(check_response,url, payload,Email,stat)
