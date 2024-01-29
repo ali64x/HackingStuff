@@ -78,7 +78,8 @@ def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race
                 
 def search_and_extract(key, file_path):
     try:
-        with open(file_path, 'r') as file:
+        with lock:
+          with open(file_path, 'r') as file:
             for line in file:
                 index = line.find(key)
                 if index != -1:
