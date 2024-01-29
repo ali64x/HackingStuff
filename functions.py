@@ -7,6 +7,9 @@ import time
 import threading
 output_lock = threading.Lock() # krmel l threads ma yiktbo ma3 ba3d w y5arrbo l dinya
 lock=threading.Lock()
+found_lock=threading.Lock()
+progress_lock = threading.Lock()
+exception_lock = threading.Lock()
 
 def appendPara(original_string, append_string): # la n3abbi l payload
     return original_string[:-1] + append_string
@@ -28,8 +31,8 @@ def send_email(to_address, subject, body):# wad7a la nib3at email
         server.starttls()
         server.login(sender_email, sender_password)
         server.sendmail(sender_email, to_address, msg.as_string())
-
-    print(f"\rEmail sent successfully to {to_address}")
+    with output_lock:
+        print(f"\rEmail sent successfully to {to_address}")
 
 def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa 
     try:
@@ -42,15 +45,16 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
             if payload in html_content:
                 with output_lock:
                     print(f"\rFound '{payload}' in the webpage {newURL}")
+                with found_lock:
                     with open("foundxss.txt",'a',encoding='utf-8') as xss:
                         xss.write(newURL+'\n')
-                send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+                # send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
         else:
             if tries < 15:
                 check_response(url,payload,Email,stat,tries+1)
                 time.sleep(0.5)
     except :
-        with lock:
+        with exception_lock:
            with open("exceptions.txt",'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
@@ -86,7 +90,8 @@ def search_and_extract(key, file_path):
                     result=(line[index + len(key):].strip())
                     return result
     except FileNotFoundError:
-        print(f"\rFile not found: {file_path}")
+        with output_lock:
+            print(f"\rFile not found: {file_path}")
     
 def progress (key, string):
     index = string.find(key)

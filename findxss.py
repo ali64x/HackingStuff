@@ -2,7 +2,6 @@ from functions import *
 from functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 event1 = threading.Event()
-progress_lock = threading.Lock()
 def main():
     try:
         con=False # continue aw la
@@ -75,27 +74,31 @@ def main():
                 stat=f"{num_of_processed_urls}/{len_of_file}"
                 
                 with progress_lock:
-                 with open("progress.txt",'w') as prog:
-                     prog.write(stat)
+                    with open("progress.txt",'w') as prog:
+                       prog.write(stat)
                     
                 for payload in payloads:
                     future=executor.submit(check_response,url, payload,Email,stat)
                     futures.append(future)
                     
                 event1.clear()
-        with open("progress.txt",'w') as p:
-            p.write('')
+        with progress_lock:
+            with open("progress.txt",'w') as p:
+                p.write('')
                 
     except Exception as e:
-        print(f"An error occurred: {e}")
-        send_email(
-            to_address = search_and_extract("Email:","last_run.txt"),
-            subject="Progress Update",
-            body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
-            )
+        with output_lock:
+            print(f"An error occurred: {e}")
+        with lock:
+            send_email(
+                to_address = search_and_extract("Email:","last_run.txt"),
+                subject="Progress Update",
+                body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
+                )
         
     except KeyboardInterrupt:
-        print(f"\rshutting down please wait utill the already in process urls is done")
+        with output_lock:
+            print(f"\rshutting down please wait utill the already in process urls is done")
         executor.shutdown(wait=True)
                
 if __name__ == "__main__":
