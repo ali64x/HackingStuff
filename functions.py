@@ -5,6 +5,8 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 import time
 import threading
+from termcolor import colored
+import os
 output_lock = threading.Lock() # krmel l threads ma yiktbo ma3 ba3d w y5arrbo l dinya
 lock=threading.Lock()
 found_lock=threading.Lock()
@@ -15,24 +17,24 @@ def appendPara(original_string, append_string): # la n3abbi l payload
     return original_string[:-1] + append_string
 
 def send_email(to_address, subject, body):# wad7a la nib3at email
-    
-    sender_email = 'auto83851@gmail.com'
-    sender_password = 'zmiu chxr kfiq sftr'
-    smtp_server = 'smtp.gmail.com'
-    smtp_port = 587  # Use 465 for SSL
+    try:
+        sender_email = 'auto83851@gmail.com'
+        sender_password = 'zmiu chxr kfiq sftr'
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587  # Use 465 for SSL
 
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = to_address
-    msg['Subject'] = subject
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_address
+        msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'plain'))
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, to_address, msg.as_string())
-    with output_lock:
-        print(f"\rEmail sent successfully to {to_address}")
+        msg.attach(MIMEText(body, 'plain'))
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, to_address, msg.as_string())
+    except Exception as e:
+        pass
 
 def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa 
     try:
@@ -40,34 +42,45 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
         response=requests.get(newURL,timeout=time)
         html_content = response.text  # Use response.content for binary content
         with output_lock:
-            print (stat.strip(),end='\r')
+            print (stat.strip(),end='\r',flush=True)
         if html_content:
             if payload in html_content:
                 with output_lock:
-                    print(f"\rFound '{payload}' in the webpage {newURL}")
+                    print(
+                          colored(f"\rFound ",'light_green')+
+                          colored(f"'{payload}'",'red') + 
+                          colored(" in this webpage: ",'white')+ 
+                          colored(f"{newURL}\n",'light_blue')
+                          )
                 with found_lock:
                     with open("foundxss.txt",'a',encoding='utf-8') as xss:
                         xss.write(newURL+'\n')
-                # send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
-        else:
-            if tries < 15:
+                send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+                
+    except RuntimeError :
+        if tries < 15:
                 check_response(url,payload,Email,stat,tries+1)
                 time.sleep(0.5)
-    except :
+                
         with exception_lock:
            with open("exceptions.txt",'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
                   e.write(url)
             
-def measure_elapsed_time():# la ni3rif addeh akal w2t l program
+def measure_elapsed_time(flag):# la ni3rif addeh akal w2t l program
     start_time = time.time()
-    while True:
+    while not flag.is_set():
         elapsed_time = time.time() - start_time
         with output_lock:
-            print(f"\rElapsed time: {elapsed_time:.2f} seconds, under process url number: ", end='', flush=True)
-            time.sleep(0.1)
-    
+            print(
+                colored(f"\rElapsed time: ",'grey')+
+                colored(f"{elapsed_time:.2f}",'red')+
+                colored(" seconds, under process url number: ",'grey'), 
+                end='', 
+                flush=True
+                )
+        
 def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race condition
     while True:
             if len(futures) <= num_of_threads*num_of_threads:
@@ -105,4 +118,15 @@ def total (key, string):
         result=(string[index+1:].strip())
         return result
     
-    
+def logo():
+    print(
+     colored(" _____________   _____       ___    _______      ___     ___    __________    __________\n",'light_magenta')+
+     colored("|   __    ____| |     \\     |   |  |    _   \\    \\   \\  /   /  |   _______|  |   _______|\n",'light_magenta')+
+     colored("|  |  |  |      |      \\    |   |  |   | \\   \\    \\   \\/   /   |  |          |  |\n",'light_magenta')+
+     colored("|  |  |  |      |   |   \\   |   |  |   |  \\   \\    \\   \\  /    |  |          |  |\n",'light_magenta')+
+     colored("|  |__|  |_     |   |\\   \\  |   |  |   |   \\   \\    \\   \\/     |  |_______   |  |_______\n",'magenta')+
+     colored("|   __|  |_|    |   | \\   \\ |   |  |   |   /   /   / \\   \\     |_______   |  |_______   |\n",'light_magenta')+
+     colored("|  |  |  |      |   |  \\   \\|   |  |   |  /   /   /   \\   \\            |  |          |  |\n",'light_magenta')+
+     colored("|  | _|  |____  |   |   \\   |   |  |   |_/   /   /   / \\   \\    _______|  |   _______|  |\n",'light_magenta')+
+     colored("|__|__________| |___|    \\ _____|  |_______ /   /__ /   \\___\\  |__________|  |__________|\n",'light_magenta')
+     )

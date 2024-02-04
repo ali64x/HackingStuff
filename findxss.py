@@ -1,9 +1,15 @@
 from functions import *
 from functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
+from termcolor import colored
+
 event1 = threading.Event()
+flag = threading.Event()
+
+
 def main():
     try:
+        logo()
         con=False # continue aw la
         line_number=1
         num_of_processed_urls=0
@@ -18,7 +24,11 @@ def main():
                 num_of_processed_urls = int(progress('/',progr))
                 tot=int(total('/',progr))
                 
-                c = input(f"you have {tot-num_of_processed_urls} unfinshed job in {urlfile} do you want to continue?(y/n): ")
+                c = input(
+                            colored(f"you have ",'blue')+
+                            colored(f"({tot-num_of_processed_urls})",'red')+
+                            colored(f" unfinshed job in {urlfile} do you want to continue?(y/n): ","blue")
+                        )
                 
                 if c == 'y':
                     
@@ -31,27 +41,43 @@ def main():
                             line_number = num_of_processed_urls
                             con=True
                         elif c == 'n':
-                            a = input("please confirm your choice with 'y' for yes or 'n' for no : ")   
+                            a = input(colored("please confirm your choice with 'y' for yes or 'n' for no : ",'light_red'))   
                             if a == "n":
                                 break
-                        c = input("please confirm your choice with 'y' for yes or 'n' for no \"case sensitive\" : ")   
+                        c = input(colored("please confirm your choice with 'y' for yes or 'n' for no \"case sensitive\" : ",'light_red'))   
                         
                 
         if not con :
-            print("IMPORTANT : urls should be formatted as follow :\"https://example.com?q=ok\" use use the \"does\" tool to format your urls properly")
-            urlfile = input("File path: ")
-            num_of_threads = int(input("nb of urls at the same time : "))
-            Email = input("Email : ")
+            print(
+                  colored("IMPORTANT :",'light_red') + 
+                  colored(" urls should be formatted as follow :",'white')+ 
+                  colored(" \"https://example.com?q=ok\" ",'dark_grey') +
+                  colored("you can use the \"does\" tool to format your urls properly\n",'white')
+                  )
+            with open('foundxss.txt','r') as fr:
+                found=None
+                found=fr.readline()
+                if found :
+                    erase=input(colored("There are previous findings in the 'foundxss.txt' file. Do you want to overwrite them? Choosing 'n' will append the new findings to the previous ones (y/n): ",'dark_grey'))
+                    if erase == 'y':
+                        erase2=input(colored("Are you sure you want to delete the content of 'foundxss.txt': ",'red'))
+                        if erase2=='y':
+                            with open('foundxss.txt','w') as fw:
+                                fw.write('')
+                    
+            urlfile = input(colored("\nFile path: ",'cyan'))
+            num_of_threads = int(input(colored("nb of urls at the same time : ",'cyan')))
+            Email = input(colored("Email : ",'cyan'))
             num_of_processed_urls= 0
             with open("last_run.txt",'w') as lr:
                 details=(f"urlfile:{urlfile}\nnum_of_threads:{num_of_threads}\nEmail:{Email}")
                 lr.write(details)
-            stat=f"calculating please wait ..."
-            print("\r"+stat)
-        futures = [] 
-        payloads = ['<yaali>', 'ya"ali\'', 'ya/ali' , '{ya{}ali}'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
+            ini_stat=f"\ncalculating please wait ...\n"
+            print("\r"+colored(ini_stat,'light_yellow'))
+        futures = []
+        payloads = ['<yaali>','<a>yaali', 'ya"ali\'', 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
         
-        elapsed_time_thread = threading.Thread(target=measure_elapsed_time) # el processing time
+        elapsed_time_thread = threading.Thread(target=measure_elapsed_time, args=(flag,) ) # el processing time
         elapsed_time_thread.daemon = True
         elapsed_time_thread.start()
         
@@ -71,6 +97,7 @@ def main():
                 event1.wait()
                 num_of_processed_urls+=1
                 
+                colored_stat=colored(f"( {num_of_processed_urls}",'cyan')+" / "+colored(f"{len_of_file} )",'cyan')
                 stat=f"{num_of_processed_urls}/{len_of_file}"
                 
                 with progress_lock:
@@ -78,7 +105,7 @@ def main():
                        prog.write(stat)
                     
                 for payload in payloads:
-                    future=executor.submit(check_response,url, payload,Email,stat)
+                    future=executor.submit(check_response,url, payload,Email,colored_stat)
                     futures.append(future)
                     
                 event1.clear()
@@ -98,15 +125,19 @@ def main():
         
     except KeyboardInterrupt:
         with output_lock:
-            print(f"\rshutting down please wait utill the already in process urls is done")
+            print(colored("\rshutting down please wait utill the already in process urls is done",'light_red'))
         executor.shutdown(wait=True)
-               
-if __name__ == "__main__":
-    main()
+        
+    flag.set()
+    elapsed_time_thread.join()
+    print(colored_stat,flush=True)
     urlfile= search_and_extract("urlfile:","last_run.txt")
     send_email(
         to_address = search_and_extract("Email:","last_run.txt"),
         subject="Progress Update",
         body=f"Job is over : {urlfile}"
     )
-    print("\nAll DONE !")
+    
+if __name__ == "__main__":
+    main()
+    print(colored("\nAll DONE !\n",'light_green'))
