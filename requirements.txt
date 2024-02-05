@@ -1,6 +1,2 @@
-email.mime.text
-email.mime.multipart
 requests
-termcolor
-concurrent.futures
 termcolor
