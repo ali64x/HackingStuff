@@ -47,14 +47,17 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
             if payload in html_content:
                 with output_lock:
                     print(
-                          colored(f"\rFound ",'light_green')+
-                          colored(f"'{payload}'",'red') + 
-                          colored(" in this webpage: ",'white')+ 
+                          colored(f"\rFound ",'light_green')+" [ "+
+                          colored(f"{payload}'",'red') + 
+                          colored(" ] in this webpage: ",'white')+ 
                           colored(f"{newURL}\n",'light_blue')
                           )
                 with found_lock:
-                    with open("foundxss.txt",'a',encoding='utf-8') as xss:
-                        xss.write(newURL+'\n')
+                    with open("foundxss.txt",'a+',encoding='utf-8') as xss:
+                        xss.seek(0)
+                        con = xss.readlines()
+                        if url not in con :
+                            xss.write(url)
                 send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
                 
     except RuntimeError :
@@ -74,9 +77,9 @@ def measure_elapsed_time(flag):# la ni3rif addeh akal w2t l program
         elapsed_time = time.time() - start_time
         with output_lock:
             print(
-                colored(f"\rElapsed time: ",'grey')+
+                colored(f"\rElapsed time: ",'light_grey')+
                 colored(f"{elapsed_time:.2f}",'red')+
-                colored(" seconds, under process url number: ",'grey'), 
+                colored(" seconds, under process url number: ",'light_grey'), 
                 end='', 
                 flush=True
                 )
