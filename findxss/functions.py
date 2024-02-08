@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 import time
 import threading
 from termcolor import colored
+import sys
 import os
 output_lock = threading.Lock() # krmel l threads ma yiktbo ma3 ba3d w y5arrbo l dinya
 lock=threading.Lock()
@@ -36,7 +37,7 @@ def send_email(to_address, subject, body):# wad7a la nib3at email
     except Exception as e:
         pass
 
-def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa 
+def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa killa 
     try:
         newURL= appendPara(url,payload)
         response=requests.get(newURL,timeout=time)
@@ -53,20 +54,26 @@ def check_response(url,payload,Email,stat,tries=0,time=30):# l ossa killa
                           colored(f"{newURL}\n",'light_blue')
                           )
                 with found_lock:
-                    with open("foundxss.txt",'a+',encoding='utf-8') as xss:
-                        xss.seek(0)
-                        con = xss.readlines()
-                        if url not in con :
-                            xss.write(url)
-                send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {newURL}")
+                    try:
+                        with open(outputfile,'a+',encoding='utf-8') as xss:
+                            xss.seek(0)
+                            con = xss.readlines()
+                            if url not in con :
+                                xss.write(url)
+                                if Email :
+                                    send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {url}")
+                    except FileNotFoundError as fe:
+                        print(fe)
+                        os._exit(-1)
+                
                 
     except RuntimeError :
-        if tries < 15:
+        if tries < 3:
                 check_response(url,payload,Email,stat,tries+1)
-                time.sleep(0.5)
+                time.sleep(5)
                 
         with exception_lock:
-           with open("exceptions.txt",'r+') as e:
+           with open("findxss//exceptions.txt",'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
                   e.write(url)
@@ -108,6 +115,8 @@ def search_and_extract(key, file_path):
     except FileNotFoundError:
         with output_lock:
             print(f"\rFile not found: {file_path}")
+        sys.exit()
+    return None
     
 def progress (key, string):
     index = string.find(key)
