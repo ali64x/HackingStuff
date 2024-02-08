@@ -73,7 +73,7 @@ def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa k
                 time.sleep(5)
                 
         with exception_lock:
-           with open("findxss//exceptions.txt",'r+') as e:
+           with open("findxss/exceptions.txt",'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
                   e.write(url)
