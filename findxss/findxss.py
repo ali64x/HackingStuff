@@ -3,6 +3,7 @@ from .functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 from termcolor import colored
 import argparse
+import os
 
 event1 = threading.Event()
 flag = threading.Event()
