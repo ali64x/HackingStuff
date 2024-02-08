@@ -1,5 +1,12 @@
 <h1>FINDXSS</h1>
 
+## installation:
+git clone https://github.com/ali64x/HackingStuff.git
+cd HackingStuff/
+pip install .
+you may need to install termcolor manually to do that use:
+pip install termcolor --upgrade
+
 ## Description:
 
 This tool facilitates XSS testing on multiple URLs, systematically searching all parameters for potential XSS injections with ease. You have control over its speed, allowing you to slow it down for programs that do not permit scanning or speed it up for larger files. Additionally, providing your email allows the tool to send you progress updates.
