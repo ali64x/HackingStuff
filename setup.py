@@ -26,7 +26,7 @@ setup(
     # Dependencies
     install_requires=[
        'requests',
-       'termcolor'
+       'termcolor>=2.4.0'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
