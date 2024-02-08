@@ -1,5 +1,20 @@
 <h1>FINDXSS</h1>
 
+## installation:
+```sh
+git clone https://github.com/ali64x/HackingStuff.git
+```
+```sh
+cd HackingStuff/
+```
+```sh
+pip install .
+```
+you may need to install termcolor manually to do that use:
+```sh
+pip install termcolor --upgrade
+```
+
 ## Description:
 
 This tool facilitates XSS testing on multiple URLs, systematically searching all parameters for potential XSS injections with ease. You have control over its speed, allowing you to slow it down for programs that do not permit scanning or speed it up for larger files. Additionally, providing your email allows the tool to send you progress updates.
@@ -26,9 +41,6 @@ This tool facilitates XSS testing on multiple URLs, systematically searching all
 <h3>HOW TO USE IT:</h3>
 all you have to do is just provide a file containing the urls formated as follow : "<a><b>https://www.example.com?parameter=ok</b></a>" one url per line .
 you can use the "<a href="https://github.com/ali64x/does.git">does</a>" tool to format the urls properly </h6>
-<br><br>
-<h3>Installation:</h3>
-create a new folder , open the terminal in that directory , type : <strong>git clone https://github.com/ali64x/HackingStuff.git</strong>
 <br><br>
 <h3>Run :</h3>
 open the newly installed folder or use cd command to navigate to it ,then type : <strong>python3 findxss.py</strong>
