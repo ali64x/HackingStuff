@@ -1,11 +1,19 @@
 <h1>FINDXSS</h1>
 
 ## installation:
-git clone https://github.com/ali64x/HackingStuff.git<br>
-cd HackingStuff/<br>
-pip install .<br>
-you may need to install termcolor manually to do that use:<br>
-pip install termcolor --upgrade<br>
+```sh
+git clone https://github.com/ali64x/HackingStuff.git
+```
+```sh
+cd HackingStuff/
+```
+```sh
+pip install .
+```
+you may need to install termcolor manually to do that use:
+```sh
+pip install termcolor --upgrade
+```
 
 ## Description:
 
