@@ -14,6 +14,7 @@ found_lock=threading.Lock()
 progress_lock = threading.Lock()
 exception_lock = threading.Lock()
 
+
 def appendPara(original_string, append_string): # la n3abbi l payload
     return original_string[:-1] + append_string
 
@@ -73,7 +74,8 @@ def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa k
                 time.sleep(5)
                 
         with exception_lock:
-           with open("findxss/exceptions.txt",'r+') as e:
+           exceptions_file = os.path.join('findxss', 'exceptions.txt')
+           with open(exceptions_file,'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
                   e.write(url)

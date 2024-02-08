@@ -3,8 +3,6 @@ from .functions import search_and_extract , progress
 from concurrent.futures import ThreadPoolExecutor, wait,as_completed
 from termcolor import colored
 import argparse
-import re
-
 
 event1 = threading.Event()
 flag = threading.Event()
@@ -13,27 +11,30 @@ flag = threading.Event()
 def main():
     try:
         logo()
+        progress_file = os.path.join('findxss', 'progress.txt')
+        last_run_file = os.path.join('findxss', 'last_run.txt')
+        foundxss_file = os.path.join('findxss', 'foundxss.txt')
         parser = argparse.ArgumentParser(description="Mining URLs from dark corners of Web Archives ")
         parser.add_argument("-e", "--email", help="email you want to send results and update to.",default=False)
         parser.add_argument("-l", "--list", help="File containing a list of urls.")
         parser.add_argument("-c", "--conPreRun", help="continue previouse work if exist takes (y/n) arguments only .",default=False)
-        parser.add_argument("-o", "--output", help="output file path. Default is foundxss.txt file  in the same directory.", default='findxss/foundxss.txt')
+        parser.add_argument("-o", "--output", help="output file path. Default is foundxss.txt file  in the same directory.", default=foundxss_file)
         parser.add_argument("-n", "--NumberOfUrls", help="number of processed urls per at once 'threads= n*n'.",default=5)
         args = parser.parse_args()
         
         con=False # continue aw la
         line_number=1
         num_of_processed_urls=0
-        with open("findxss/progress.txt",'r+') as prog:
+        with open(progress_file,'r+') as prog:
             progr=prog.readline().strip()
             if progr:
                  
-                urlfile= search_and_extract("urlfile:","findxss/last_run.txt")
-                num_of_threads = int(search_and_extract("num_of_threads:","findxss/last_run.txt"))
-                Email = search_and_extract("Email:","findxss/last_run.txt")
+                urlfile= search_and_extract("urlfile:",last_run_file)
+                num_of_threads = int(search_and_extract("num_of_threads:",last_run_file))
+                Email = search_and_extract("Email:",last_run_file)
                 num_of_processed_urls = int(progress('/',progr))
-                if search_and_extract("outputfile:","findxss/last_run.txt"):
-                    outputfile=search_and_extract("outputfile:","findxss/last_run.txt")
+                if search_and_extract("outputfile:",last_run_file):
+                    outputfile=search_and_extract("outputfile:",last_run_file)
                 tot=int(total('/',progr))
                 if args.conPreRun :
                     c = args.conPreRun
@@ -87,7 +88,7 @@ def main():
                 Email = input(colored("Email : ",'cyan'))
                 outputfile = input(colored("Output File (default is foundxss.txt) : ", 'cyan'))
                 if not outputfile :
-                    outputfile="findxss/foundxss.txt"
+                    outputfile=foundxss_file
                     print (colored ("[*] Output file set to "+outputfile, 'yellow'))
             else:
                 urlfile=args.list
@@ -97,8 +98,8 @@ def main():
                         
             # check if user wants to delete the default output file or append to it 
             
-            if outputfile == "findxss/foundxss.txt" :
-                with open('findxss/foundxss.txt','r') as fr:
+            if outputfile == foundxss_file :
+                with open(foundxss_file,'r') as fr:
                     found=None
                     found=fr.readline()
                     if found :
@@ -106,11 +107,11 @@ def main():
                         if erase == 'y':
                             erase2=input(colored("Are you sure you want to delete the content of 'foundxss.txt': ",'red'))
                             if erase2=='y':
-                                with open('findxss/foundxss.txt','w') as fw:
+                                with open(foundxss_file,'w') as fw:
                                     fw.write('')
                                     
             num_of_processed_urls= 0
-            with open("findxss/last_run.txt",'w') as lr:
+            with open(last_run_file,'w') as lr:
                 details=(f"urlfile:{urlfile}\nnum_of_threads:{num_of_threads}\nEmail:{Email}\noutputfile:{outputfile}")
                 lr.write(details)
             ini_stat=f"\ncalculating please wait ...\n"
@@ -142,7 +143,7 @@ def main():
                 stat=f"{num_of_processed_urls}/{len_of_file}"
                 
                 with progress_lock:
-                    with open("findxss/progress.txt",'w') as prog:
+                    with open(progress_file,'w') as prog:
                        prog.write(stat)
                     
                 for payload in payloads:
@@ -151,7 +152,7 @@ def main():
                     
                 event1.clear()
         with progress_lock:
-            with open("findxss/progress.txt",'w') as p:
+            with open(progress_file,'w') as p:
                 p.write('')
                 
     except Exception as e:
@@ -160,7 +161,7 @@ def main():
         with lock:
             if Email:
                 send_email(
-                    to_address = search_and_extract("Email:","findxss/last_run.txt"),
+                    to_address = search_and_extract("Email:",last_run_file),
                     subject="Progress Update",
                     body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
                     )
@@ -174,10 +175,10 @@ def main():
     flag.set()
     elapsed_time_thread.join()
     print(colored_stat,flush=True)
-    urlfile= search_and_extract("urlfile:","findxss/last_run.txt")
+    urlfile= search_and_extract("urlfile:",last_run_file)
     if Email:
         send_email(
-            to_address = search_and_extract("Email:","findxss/last_run.txt"),
+            to_address = search_and_extract("Email:",last_run_file),
             subject="Progress Update",
             body=f"Job is over : {urlfile}"
         )
