@@ -75,6 +75,7 @@ def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa k
                 
         with exception_lock:
            exceptions_file = os.path.join('findxss', 'exceptions.txt')
+           exceptions_file=os.path.abspath(exceptions_file)
            with open(exceptions_file,'r+') as e:
               filelines=e.readlines().strip()
               if url not in filelines: 
