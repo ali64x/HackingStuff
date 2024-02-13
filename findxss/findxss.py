@@ -149,6 +149,7 @@ def main():
                 with progress_lock:
                     with open(progress_file,'w') as prog:
                        prog.write(stat)
+                prog.close()
                     
                 for payload in payloads:
                     future=executor.submit(check_response,url, payload,colored_stat,outputfile,Email)
@@ -169,12 +170,13 @@ def main():
                     subject="Progress Update",
                     body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
                     )
+        sys.exit()
         
     except KeyboardInterrupt:
         with output_lock:
-            print(colored("\rshutting down please wait utill the already in process urls is done",'light_red'))
-        if executor:
+            print(colored("\rshutting down please wait utill the already in process urls are done",'light_red'))
             executor.shutdown(wait=True)
+        sys.exit()
         
     flag.set()
     elapsed_time_thread.join()

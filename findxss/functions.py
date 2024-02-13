@@ -65,7 +65,7 @@ def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa k
                                     send_email(Email,"XSS Finder Tool",f"Found possible XSS in this URL : {url}")
                     except FileNotFoundError as fe:
                         print(fe)
-                        os._exit(-1)
+                        sys.exit()
                 
                 
     except RuntimeError :
