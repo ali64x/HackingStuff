@@ -121,7 +121,7 @@ def main():
             ini_stat=f"\ncalculating please wait ...\n"
             print("\r"+colored(ini_stat,'light_yellow'))
         futures = []
-        payloads = ['<yaali>','<a>yaali', 'ya"ali\'', 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
+        payloads = ['<yaali>','<a>yaali', 'ya"ali\''] #, 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
         
         elapsed_time_thread = threading.Thread(target=measure_elapsed_time, args=(flag,) ) # el processing time
         elapsed_time_thread.daemon = True
