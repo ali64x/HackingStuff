@@ -8,6 +8,9 @@ import os
 event1 = threading.Event()
 flag = threading.Event()
 
+# 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
+payloads = ['<yaali>' , 'ya"ali\''] 
+
 
 def main():
     try:
@@ -121,8 +124,7 @@ def main():
             ini_stat=f"\ncalculating please wait ...\n"
             print("\r"+colored(ini_stat,'light_yellow'))
         futures = []
-        payloads = ['<yaali>','<a>yaali', 'ya"ali\''] #, 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
-        
+                
         elapsed_time_thread = threading.Thread(target=measure_elapsed_time, args=(flag,) ) # el processing time
         elapsed_time_thread.daemon = True
         elapsed_time_thread.start()
@@ -175,7 +177,7 @@ def main():
     except KeyboardInterrupt:
         with output_lock:
             print(colored("\rshutting down please wait utill the already in process urls are done",'light_red'))
-            executor.shutdown(wait=True)
+            executor.shutdown()
         sys.exit()
         
     flag.set()

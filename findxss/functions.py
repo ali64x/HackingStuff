@@ -47,10 +47,14 @@ def check_response(url,payload,stat,outputfile,Email,tries=0,time=30):# l ossa k
             print (stat.strip(),end='\r',flush=True)
         if html_content:
             if payload in html_content:
+                if "<" in payload :
+                    short_payload = "<>"
+                elif '"'  in payload :
+                    short_payload = '""'
                 with output_lock:
                     print(
                           colored(f"\rFound ",'light_green')+" [ "+
-                          colored(f"{payload}'",'red') + 
+                          colored(f"{short_payload}",'red') + 
                           colored(" ] in this webpage: ",'white')+ 
                           colored(f"{newURL}\n",'light_blue')
                           )
@@ -139,9 +143,9 @@ def logo():
      colored("|   __    ____| |     \\     |   |  |    _   \\    \\   \\  /   /  |   _______|  |   _______|\n",'light_magenta')+
      colored("|  |  |  |      |      \\    |   |  |   | \\   \\    \\   \\/   /   |  |          |  |\n",'light_magenta')+
      colored("|  |  |  |      |   |   \\   |   |  |   |  \\   \\    \\   \\  /    |  |          |  |\n",'light_magenta')+
-     colored("|  |__|  |_     |   |\\   \\  |   |  |   |   \\   \\    \\   \\/     |  |_______   |  |_______\n",'magenta')+
+     colored("|  |__|  |_     |   |\\   \\  |   |  |   |   \\   \\    \\   \\/     |  |_______   |  |_______\n",'light_magenta')+
      colored("|   __|  |_|    |   | \\   \\ |   |  |   |   /   /   / \\   \\     |_______   |  |_______   |\n",'light_magenta')+
      colored("|  |  |  |      |   |  \\   \\|   |  |   |  /   /   /   \\   \\            |  |          |  |\n",'light_magenta')+
-     colored("|  | _|  |____  |   |   \\   |   |  |   |_/   /   /   / \\   \\    _______|  |   _______|  |\n",'light_magenta')+
+     colored("|  |__|  |____  |   |   \\   |   |  |   |_/   /   /   / \\   \\    _______|  |   _______|  |\n",'light_magenta')+
      colored("|__|__________| |___|    \\ _____|  |_______ /   /__ /   \\___\\  |__________|  |__________|\n",'light_magenta')
      )

@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 
+
 setup(
     name='findxss',
-    version='1.0.0',
+    version='1.1.0',
     packages=find_packages(),
     package_data={
         '': ['*.txt'],  # Include all .txt files in the package root
@@ -26,7 +27,7 @@ setup(
     # Dependencies
     install_requires=[
        'requests',
-       'termcolor>=2.4.0'
+       'termcolor>=2.4.0',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
