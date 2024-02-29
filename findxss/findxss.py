@@ -15,9 +15,9 @@ payloads = ['<yaali>' , 'ya"ali\'']
 def main():
     try:
         logo()
-        progress_file = os.path.join('findxss', 'progress.txt')
-        last_run_file = os.path.join('findxss', 'last_run.txt')
-        foundxss_file = os.path.join('findxss', 'foundxss.txt')
+        progress_file = os.path.join(os.path.dirname(__file__), 'progress.txt')
+        last_run_file = os.path.join(os.path.dirname(__file__), 'last_run.txt')
+        foundxss_file = os.path.join(os.path.dirname(__file__), 'foundxss.txt')
         foundxss_file = os.path.abspath(foundxss_file)
         progress_file = os.path.abspath(progress_file)
         last_run_file = os.path.abspath(last_run_file)
@@ -87,7 +87,7 @@ def main():
                                     
             if  len(sys.argv) == 1 or "-h" in sys.argv[1:] : #if no argument is passed or -h is present, show this
                 urlfile = input(colored("\nFile path: ",'cyan'))
-                num_of_threads = input(colored("nb of urls at the same time (default is 5) : ",'cyan'))
+                num_of_threads = input(colored("nb of urls runing at the same time (default is 5) : ",'cyan'))
                 if not num_of_threads:
                     num_of_threads = 5
                 else:
@@ -140,7 +140,10 @@ def main():
             len_of_file=len(urls) + (line_number - 1)
             
         event1.set()
-        with ThreadPoolExecutor(max_workers=num_of_threads*num_of_threads) as executor:
+        
+        # main part of the code 
+        
+        with ThreadPoolExecutor(max_workers=num_of_threads*len(payloads)+3) as executor:
             for url in urls:
                 event1.wait()
                 num_of_processed_urls+=1
@@ -176,9 +179,9 @@ def main():
         
     except KeyboardInterrupt:
         with output_lock:
-            print(colored("\rshutting down please wait utill the already in process urls are done",'light_red'))
-            executor.shutdown()
-        sys.exit()
+            print(colored("\nshutting down please wait utill the already in process urls are done",'light_red'))
+            time.sleep(2)
+            sys.exit()
         
     flag.set()
     elapsed_time_thread.join()
