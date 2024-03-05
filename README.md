@@ -38,9 +38,10 @@ This tool facilitates XSS testing on multiple URLs, systematically searching all
 - `foundxss.txt`: Contains all vulnerable URLs.
 - `exceptions.txt`: Stores URLs that encountered errors during scanning.
 
-<h3>HOW TO USE IT:</h3>
+## HOW TO USE IT:
 all you have to do is just provide a file containing the urls formated as follow : "<a><b>https://www.example.com?parameter=ok</b></a>" one url per line .
-you can use the "<a href="https://github.com/ali64x/does.git">does</a>" tool to format the urls properly </h6>
+you can use the "<a href="https://github.com/ali64x/does.git">does</a>" tool to format the urls properly </h6><br><br>
+Or using flags ,type `findxss -h` to see all the available options .
 <br><br>
 <h3>Run :</h3>
 open the newly installed folder or use cd command to navigate to it ,then type : <strong>python3 findxss.py</strong>
