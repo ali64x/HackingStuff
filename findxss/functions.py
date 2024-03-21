@@ -97,6 +97,7 @@ def measure_elapsed_time(flag):# la ni3rif addeh akal w2t l program
                 end='', 
                 flush=True
                 )
+            time.sleep(0.1)
         
 def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race condition
     while True:
@@ -105,10 +106,12 @@ def check_if_list_is_empty(futures,event,num_of_threads):# krmel ma nfout b race
             else:
                 event.clear()                   
                 new_futures = []
-                for f in futures:                        # krmel nim7i mn l list le 5olso
+                # krmel nim7i mn l list le 5olso
+                for f in futures: 
                     if not f.done():
                         new_futures.append(f)
                 futures = new_futures
+            time.sleep(.1)  
                 
 def search_and_extract(key, file_path):
     try:

@@ -16,11 +16,11 @@ event1 = threading.Event()
 flag = threading.Event()
 
 # 'ya/ali' , 'ya{}ali'] # ntibih l payload lezm ma yin3amallo detect eza fe escape character
-payloads = ['<yaali>' , 'ya"ali\'','<a>yaali'] 
-
+payloads = ['<yaali>' , 'ya"ali\'','<a>yaali']  
 
 def main():
     try:
+        
         logo()
         progress_file = os.path.join(os.path.dirname(__file__), 'progress.txt')
         last_run_file = os.path.join(os.path.dirname(__file__), 'last_run.txt')
@@ -28,6 +28,7 @@ def main():
         foundxss_file = os.path.abspath(foundxss_file)
         progress_file = os.path.abspath(progress_file)
         last_run_file = os.path.abspath(last_run_file)
+        
         parser = argparse.ArgumentParser(description="Mining URLs from dark corners of Web Archives ")
         parser.add_argument("-e", "--email", help="email you want to send results and update to.",default=False)
         parser.add_argument("-l", "--list", help="File containing a list of urls.")
@@ -140,6 +141,7 @@ def main():
         submit_thread.daemon = True
         submit_thread.start()
         
+        # lnrou7 l3nd l satir le kinna 3indo e5r marra
         with open(urlfile, "r", encoding='utf-8') as uf:
             for _ in range(line_number - 1):
                 uf.readline()
@@ -151,23 +153,21 @@ def main():
         # main part of the code 
         
         with ThreadPoolExecutor(max_workers=num_of_threads*len(payloads)+3) as executor:
-            for url in urls:
-                event1.wait()
-                num_of_processed_urls+=1
-                
-                colored_stat=colored(f"( {num_of_processed_urls}",'cyan')+" / "+colored(f"{len_of_file} )",'cyan')
-                stat=f"{num_of_processed_urls}/{len_of_file}"
-                
-                with progress_lock:
-                    with open(progress_file,'w') as prog:
-                        prog.write(stat)
-                prog.close() # just to make sure it is closed 
+            with open(progress_file,'w') as prog:
+                for url in urls:
+                    event1.wait()
+                    num_of_processed_urls+=1
                     
-                for payload in payloads:
-                    future=executor.submit(check_response,url, payload,colored_stat,outputfile,Email)
-                    futures.append(future)
-                    
-                event1.clear()
+                    colored_stat=colored(f"( {num_of_processed_urls}",'cyan')+" / "+colored(f"{len_of_file} )",'cyan')
+                    stat=f"{num_of_processed_urls}/{len_of_file}"
+                    with progress_lock:
+                        prog.write(stat) 
+                        
+                    for payload in payloads:
+                        future=executor.submit(check_response,url, payload,colored_stat,outputfile,Email)
+                        futures.append(future)
+                        
+                    event1.clear()
         with progress_lock:
             with open(progress_file,'w') as p:
                 p.write('')
@@ -182,6 +182,7 @@ def main():
                     subject="Progress Update",
                     body=f"Job has been terminated unexpectedly : {urlfile}\nError: {e}"
                     )
+        time.sleep(1)
         sys.exit()
         
     except KeyboardInterrupt:
@@ -194,6 +195,7 @@ def main():
     elapsed_time_thread.join()
     print(colored_stat,flush=True)
     urlfile= search_and_extract("urlfile:",last_run_file)
+    
     if Email:
         send_email(
             to_address = search_and_extract("Email:",last_run_file),
