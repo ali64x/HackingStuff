@@ -161,7 +161,9 @@ def main():
                     colored_stat=colored(f"( {num_of_processed_urls}",'cyan')+" / "+colored(f"{len_of_file} )",'cyan')
                     stat=f"{num_of_processed_urls}/{len_of_file}"
                     with progress_lock:
-                        prog.write(stat) 
+                        prog.seek(0)
+                        prog.truncate()
+                        prog.write(stat)
                         
                     for payload in payloads:
                         future=executor.submit(check_response,url, payload,colored_stat,outputfile,Email)
